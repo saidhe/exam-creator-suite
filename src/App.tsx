@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/hooks/useTheme";
 
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -16,9 +17,13 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Corrections from "./pages/Corrections";
+import MyExams from "./pages/MyExams";
+import MyResults from "./pages/MyResults";
+import TakeExam from "./pages/TakeExam";
 import AdminUsers from "./pages/admin/Users";
 import AdminSubjects from "./pages/admin/Subjects";
 import AdminLevels from "./pages/admin/Levels";
+import SendNotifications from "./pages/admin/SendNotifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,9 +69,16 @@ const AppRoutes = () => {
       <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
       <Route path="/corrections/:id" element={<ProtectedRoute><Corrections /></ProtectedRoute>} />
       
+      {/* Student routes */}
+      <Route path="/my-exams" element={<ProtectedRoute><MyExams /></ProtectedRoute>} />
+      <Route path="/my-results" element={<ProtectedRoute><MyResults /></ProtectedRoute>} />
+      <Route path="/take-exam/:id" element={<ProtectedRoute><TakeExam /></ProtectedRoute>} />
+      
+      {/* Admin routes */}
       <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
       <Route path="/admin/subjects" element={<ProtectedRoute><AdminSubjects /></ProtectedRoute>} />
       <Route path="/admin/levels" element={<ProtectedRoute><AdminLevels /></ProtectedRoute>} />
+      <Route path="/admin/notifications" element={<ProtectedRoute><SendNotifications /></ProtectedRoute>} />
       
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -75,15 +87,17 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
