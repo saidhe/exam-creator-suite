@@ -11,23 +11,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useTheme } from '@/hooks/useTheme';
+import { toast } from 'sonner';
 
 const Settings = () => {
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState({
-    darkMode: true,
     notifications: true,
     emailNotifications: false,
     language: 'fr',
   });
 
+  const handleLanguageChange = (value: string) => {
+    setSettings({ ...settings, language: value });
+    toast.info(value === 'fr' ? 'Langue changée en Français' : 'Language changed to English');
+  };
+
   return (
     <AppLayout title="Paramètres">
-      <div className="space-y-6 animate-fade-in max-w-2xl mx-auto">
+      <div className="space-y-6 animate-fade-in max-w-2xl mx-auto pb-20 md:pb-0">
         {/* Appearance */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Sun className="w-5 h-5" />
+              {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
               Apparence
             </CardTitle>
           </CardHeader>
@@ -40,8 +47,8 @@ const Settings = () => {
                 </p>
               </div>
               <Switch
-                checked={settings.darkMode}
-                onCheckedChange={(checked) => setSettings({ ...settings, darkMode: checked })}
+                checked={theme === 'dark'}
+                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
               />
             </div>
           </CardContent>
@@ -65,7 +72,7 @@ const Settings = () => {
               </div>
               <Select
                 value={settings.language}
-                onValueChange={(value) => setSettings({ ...settings, language: value })}
+                onValueChange={handleLanguageChange}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
@@ -168,7 +175,7 @@ const Settings = () => {
         </Card>
 
         {/* Version */}
-        <p className="text-center text-sm text-muted-foreground pb-20 md:pb-0">
+        <p className="text-center text-sm text-muted-foreground">
           EvalPro v1.0.0
         </p>
       </div>
