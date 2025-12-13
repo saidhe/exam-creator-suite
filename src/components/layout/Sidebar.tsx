@@ -8,7 +8,8 @@ import {
   BookOpen,
   HelpCircle,
   GraduationCap,
-  UserCog
+  UserCog,
+  Bell
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -34,6 +35,7 @@ const Sidebar = () => {
     { to: '/admin/users', icon: UserCog, label: 'Gestion Utilisateurs' },
     { to: '/admin/subjects', icon: BookOpen, label: 'Matières' },
     { to: '/admin/levels', icon: GraduationCap, label: 'Niveaux' },
+    { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
   ];
 
   const commonNavItems = [
