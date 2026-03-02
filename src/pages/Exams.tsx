@@ -202,9 +202,9 @@ const Exams = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link to={`/exams/${exam.id}`} className="flex items-center">
+                          <Link to={`/exams/${exam.id}/submissions`} className="flex items-center">
                             <Eye className="w-4 h-4 mr-2" />
-                            Voir
+                            Voir les soumissions
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>

@@ -66,7 +66,7 @@ const Dashboard = () => {
             .select(`
               id,
               exam:exams(title, subject:subjects(name)),
-              student:profiles(full_name, email)
+              student:profiles!submissions_student_id_fkey(full_name, email)
             `)
             .eq('status', 'soumis')
             .limit(5);
