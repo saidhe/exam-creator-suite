@@ -93,6 +93,21 @@ const TakeExam = () => {
       if (examError) throw examError;
       setExam(examData);
 
+      // Check if already submitted
+      const { data: submittedData } = await supabase
+        .from('submissions')
+        .select('id, status')
+        .eq('exam_id', id)
+        .eq('student_id', user.id)
+        .in('status', ['soumis', 'corrige'])
+        .maybeSingle();
+
+      if (submittedData) {
+        toast.info('Vous avez déjà soumis cette épreuve');
+        navigate('/my-exams');
+        return;
+      }
+
       // Fetch exam questions
       const { data: questionsData, error: questionsError } = await supabase
         .from('exam_questions')
@@ -110,29 +125,55 @@ const TakeExam = () => {
       setQuestions(questionsData || []);
 
       // Get or create submission
-      const { data: submissionData, error: submissionError } = await supabase
+      const { data: existingSubmission, error: subError } = await supabase
         .from('submissions')
         .select('id, started_at')
         .eq('exam_id', id)
         .eq('student_id', user.id)
         .eq('status', 'en_cours')
-        .single();
+        .maybeSingle();
 
-      if (submissionError && submissionError.code !== 'PGRST116') {
-        throw submissionError;
-      }
+      if (subError) throw subError;
 
-      if (submissionData) {
-        setSubmission(submissionData);
-        // Calculate remaining time
-        const startTime = new Date(submissionData.started_at).getTime();
+      if (existingSubmission) {
+        setSubmission(existingSubmission);
+        const startTime = new Date(existingSubmission.started_at).getTime();
         const durationMs = (examData.duration_minutes || 60) * 60 * 1000;
         const elapsed = Date.now() - startTime;
         const remaining = Math.max(0, Math.floor((durationMs - elapsed) / 1000));
         setTimeLeft(remaining);
       } else {
-        // Set full duration if no submission yet
+        // Create a new submission automatically
+        const { data: newSubmission, error: createError } = await supabase
+          .from('submissions')
+          .insert({
+            exam_id: id,
+            student_id: user.id,
+            status: 'en_cours',
+            started_at: new Date().toISOString(),
+          })
+          .select('id, started_at')
+          .single();
+
+        if (createError) throw createError;
+        setSubmission(newSubmission);
         setTimeLeft((examData.duration_minutes || 60) * 60);
+      }
+
+      // Load existing answers if any
+      const { data: existingAnswers } = await supabase
+        .from('answers')
+        .select('question_id, answer_text')
+        .eq('submission_id', existingSubmission?.id || '');
+
+      if (existingAnswers) {
+        const savedAnswers: Record<string, string> = {};
+        existingAnswers.forEach(a => {
+          if (a.question_id && a.answer_text) {
+            savedAnswers[a.question_id] = a.answer_text;
+          }
+        });
+        setAnswers(savedAnswers);
       }
     } catch (error) {
       console.error('Error fetching exam:', error);
@@ -162,6 +203,12 @@ const TakeExam = () => {
 
     setSubmitting(true);
     try {
+      // Delete existing answers for this submission first (in case of retry)
+      await supabase
+        .from('answers')
+        .delete()
+        .eq('submission_id', submission.id);
+
       // Save all answers
       const answersToInsert = questions.map(eq => ({
         submission_id: submission.id,

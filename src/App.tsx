@@ -20,6 +20,7 @@ import Corrections from "./pages/Corrections";
 import MyExams from "./pages/MyExams";
 import MyResults from "./pages/MyResults";
 import TakeExam from "./pages/TakeExam";
+import ExamSubmissions from "./pages/ExamSubmissions";
 import AdminUsers from "./pages/admin/Users";
 import AdminSubjects from "./pages/admin/Subjects";
 import AdminLevels from "./pages/admin/Levels";
@@ -61,6 +62,7 @@ const AppRoutes = () => {
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/exams" element={<ProtectedRoute><Exams /></ProtectedRoute>} />
       <Route path="/exams/create" element={<ProtectedRoute><CreateExam /></ProtectedRoute>} />
+      <Route path="/exams/:id/submissions" element={<ProtectedRoute><ExamSubmissions /></ProtectedRoute>} />
       <Route path="/questions" element={<ProtectedRoute><Questions /></ProtectedRoute>} />
       <Route path="/classes" element={<ProtectedRoute><Classes /></ProtectedRoute>} />
       <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
